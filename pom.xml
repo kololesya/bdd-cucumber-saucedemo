@@ -27,6 +27,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>carina-webdriver</artifactId>
+			<version>1.2.11</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.30</version>
