@@ -1,4 +1,11 @@
-package com.solvd.laba.bdd.steps;
+package com.solvd.laba.steps;
+
+import java.util.List;
+
+import com.zebrunner.carina.core.AbstractTest;
+import io.cucumber.java.en.*;
+import org.apache.ibatis.session.SqlSession;
+import static org.testng.Assert.assertTrue;
 
 import com.solvd.laba.models.User;
 import com.solvd.laba.models.Order;
@@ -9,66 +16,51 @@ import com.solvd.laba.mappers.ProductMapper;
 import com.solvd.laba.utils.MyBatisUtil;
 import com.solvd.laba.web.pages.*;
 
-import io.cucumber.java.en.*;
-import org.apache.ibatis.session.SqlSession;
-import org.openqa.selenium.WebDriver;
-
-import java.util.List;
-
-import static org.testng.Assert.assertTrue;
-
-public class OrderSteps {
+public class OrderSteps extends AbstractTest {
 
     private User user;
     private List<Order> orders;
     private SqlSession session;
-
-    private WebDriver driver;
+    private ProductsPage productsPage;
+    private CartPage cartPage;
+    private CheckoutCompletePage checkoutCompletePage;
 
     @Given("user {string} from DB logs in")
     public void userLogsInFromDb(String username) {
         session = MyBatisUtil.getSessionFactory().openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         user = userMapper.getUserByUsername(username);
-
-        LoginPage loginPage = new LoginPage();
+        LoginPage loginPage = new LoginPage(getDriver());
         loginPage.open();
-        loginPage.login(user.getUsername(), user.getPassword());
+        productsPage = loginPage.login(user.getUsername(), user.getPassword());
+        productsPage.closeChromePasswordAlertIfPresent();
     }
 
     @And("adds all products from DB assigned to this user to the cart")
     public void addProductsToCartFromDb() {
         OrderMapper orderMapper = session.getMapper(OrderMapper.class);
         ProductMapper productMapper = session.getMapper(ProductMapper.class);
-
-        orders = orderMapper.getOrdersByUserId(user.getUserId());
-        ProductsPage productsPage = new ProductsPage();
-
+        orders = orderMapper.getOrdersByUserId((long) user.getUserId());
         for (Order order : orders) {
-            Product product = productMapper.getProductById(order.getProductId());
+            Product product = productMapper.getProductById((long) order.getProductId());
             for (int i = 0; i < order.getQuantity(); i++) {
                 productsPage.addProductToCartByName(product.getName());
             }
         }
-
-        productsPage.getHeaderMenuComponent().clickCartButton();
+        cartPage = productsPage.getHeaderMenuComponent().clickCartButton();
     }
 
     @When("user proceeds to checkout and confirms the order")
     public void userChecksOut() {
-        CartPage cartPage = new CartPage();
-        cartPage.clickCheckout();
-
-        CheckoutPage checkoutPage = new CheckoutPage();
-        checkoutPage.fillInfo("Olesya", "Testova", "12345");
-        checkoutPage.continueToFinish();
+        CheckoutPage checkoutPage = cartPage.clickCheckoutButton();
+        checkoutPage.fillCheckoutForm("Olesya", "Testova", "12345");
+        CheckoutOverviewPage checkoutOverviewPage = checkoutPage.clickContinueButton();
+        checkoutCompletePage = checkoutOverviewPage.clickFinishButton();
     }
 
     @Then("order should be placed successfully")
     public void verifySuccessMessage() {
-        OrderSuccessPage successPage = new OrderSuccessPage();
-        assertTrue(successPage.isOrderSuccessful(), "Order failed");
-
+        assertTrue(checkoutCompletePage.isOrderCompleteMessageDisplayed(), "Order failed");
         session.close();
     }
 }

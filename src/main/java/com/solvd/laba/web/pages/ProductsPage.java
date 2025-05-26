@@ -23,6 +23,15 @@ public class ProductsPage extends BasePage {
     @FindBy(className = "product_sort_container")
     private ExtendedWebElement sortingDropdown;
 
+    @FindBy(xpath = "//div[@role='dialog']//button[contains(text(),'OK')]")
+    private ExtendedWebElement chromeAlertOkButton;
+
+    public void closeChromePasswordAlertIfPresent() {
+        if (chromeAlertOkButton.isElementPresent(3)) {
+            chromeAlertOkButton.click();
+        }
+    }
+
     public ProductsPage (WebDriver driver) {
         super(driver);
         setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
