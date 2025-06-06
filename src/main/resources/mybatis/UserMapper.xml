@@ -6,13 +6,18 @@
 <mapper namespace="com.solvd.laba.mappers.UserMapper">
 
     <resultMap id="UserMap" type="com.solvd.laba.models.User">
-        <id property="userId" column="id"/>
+        <id property="id" column="id"/>
         <result property="username" column="username"/>
-        <result property="fullName" column="full_name"/>
+        <result property="password" column="password"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="zipCode" column="zip_code"/>
     </resultMap>
 
     <select id="getUserByUsername" parameterType="string" resultMap="UserMap">
-        SELECT * FROM users WHERE username = #{username}
+        SELECT id, username, password, first_name, last_name, zip_code
+        FROM users
+        WHERE username = #{username}
     </select>
 
 </mapper>
