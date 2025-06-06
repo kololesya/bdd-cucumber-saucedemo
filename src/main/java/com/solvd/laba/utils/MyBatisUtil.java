@@ -19,7 +19,7 @@ public class MyBatisUtil {
             properties.setProperty("db.driver", R.DATABASE.get("db.driver"));
             properties.setProperty("db.url", R.DATABASE.get("db.url"));
             properties.setProperty("db.user", R.DATABASE.get("db.user"));
-            properties.setProperty("db.pass", R.DATABASE.get("db.pass"));
+            properties.setProperty("db.password", R.DATABASE.get("db.password"));
 
             sessionFactory = new SqlSessionFactoryBuilder().build(reader, properties);
 
