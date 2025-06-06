@@ -23,7 +23,6 @@ public class CheckoutOverviewPage extends BasePage {
 
     public CheckoutOverviewPage(WebDriver driver) {
         super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
         setUiLoadedMarker(overviewTitle);
     }
 

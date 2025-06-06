@@ -25,13 +25,7 @@ public class LoginPage extends BasePage {
 
     public LoginPage(WebDriver driver) {
         super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
         setUiLoadedMarker(loginButton);
-    }
-
-    @Override
-    public Optional<String> getUrl() {
-        return Configuration.get("url");
     }
 
     public ProductsPage login(String username, String password) {

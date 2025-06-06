@@ -7,6 +7,7 @@ import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 import com.zebrunner.carina.webdriver.decorator.PageOpeningStrategy;
 
 public class CheckoutPage extends BasePage {
+
     @FindBy(className = "title")
     private ExtendedWebElement checkoutTitle;
 
@@ -24,7 +25,6 @@ public class CheckoutPage extends BasePage {
 
     public CheckoutPage (WebDriver driver) {
         super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
         setUiLoadedMarker(continueButton);
     }
 
@@ -34,7 +34,7 @@ public class CheckoutPage extends BasePage {
         zipCodeField.type(zipCode);
     }
 
-    public CheckoutOverviewPage clickContinueButton () {
+    public CheckoutOverviewPage clickContinueButton() {
         continueButton.click();
         return new CheckoutOverviewPage(getDriver());
     }
