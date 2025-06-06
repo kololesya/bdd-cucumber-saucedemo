@@ -1,12 +1,10 @@
 package com.solvd.laba.mappers;
 
-import java.util.List;
-
+import com.solvd.laba.models.Order;
 import org.apache.ibatis.annotations.Param;
 
-import com.solvd.laba.models.Order;
+import java.util.List;
 
 public interface OrderMapper {
-
-    List<Order> getOrdersByUserId(@Param("userId") Long userId);
+    List<Order> getOrdersByUserId(@Param("userId") int userId);
 }

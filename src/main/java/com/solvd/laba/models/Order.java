@@ -1,38 +1,17 @@
 package com.solvd.laba.models;
 
+import lombok.Data;
+
+@Data
 public class Order {
 
-    private int orderId;
+    private int id;
 
     private int userId;
 
-    private int productId;
+    private String productName;
 
     private int quantity;
 
-    public int getOrderId() { return orderId; }
-
-    public void setOrderId(int orderId) { this.orderId = orderId; }
-
-    public int getUserId() { return userId; }
-
-    public void setUserId(int userId) { this.userId = userId; }
-
-    public int getProductId() { return productId; }
-
-    public void setProductId(int productId) { this.productId = productId; }
-
-    public int getQuantity() { return quantity; }
-
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "orderId=" + orderId +
-                ", userId=" + userId +
-                ", productId=" + productId +
-                ", quantity=" + quantity +
-                '}';
-    }
+    private double price;
 }

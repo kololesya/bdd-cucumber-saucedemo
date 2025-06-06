@@ -6,13 +6,14 @@
 <mapper namespace="com.solvd.laba.mappers.OrderMapper">
 
     <resultMap id="OrderMap" type="com.solvd.laba.models.Order">
-        <id property="orderId" column="id"/>
+        <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
-        <result property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
         <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
     </resultMap>
 
-    <select id="getOrdersByUserId" parameterType="long" resultMap="OrderMap">
+    <select id="getOrdersByUserId" parameterType="int" resultMap="OrderMap">
         SELECT * FROM orders WHERE user_id = #{userId}
     </select>
 
