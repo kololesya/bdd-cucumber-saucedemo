@@ -34,7 +34,6 @@ public class ProductsPage extends BasePage {
 
     public ProductsPage (WebDriver driver) {
         super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
         setUiLoadedMarker(sortingDropdown);
     }
 
