@@ -30,7 +30,7 @@ public class OrderSteps extends AbstractTest {
     User user;// productsPage was stored between steps as a compromise to enable continued UI navigation across steps (login → add to cart → checkout). All DB logic remains localized per step.
 
     @Given("user {string} logs in")
-    public void userLogsIn(String username) throws IOException {
+    public void userLogin(String username) throws IOException {
         MutableCapabilities caps = getMutableCapabilities();
         WebDriver driver = getDriver("chrome", caps);
         try (SqlSession session = MyBatisUtil.getSessionFactory().openSession()) {
