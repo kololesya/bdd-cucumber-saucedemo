@@ -1,8 +1,6 @@
 package com.solvd.laba.steps;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +13,7 @@ import com.solvd.laba.models.User;
 import com.solvd.laba.models.Order;
 import com.solvd.laba.mappers.UserMapper;
 import com.solvd.laba.mappers.OrderMapper;
-import com.solvd.laba.utils.MyBatisUtil;
+import com.solvd.laba.utils.MyBatisConfig;
 import com.solvd.laba.web.pages.*;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -24,65 +22,68 @@ import org.openqa.selenium.remote.CapabilityType;
 
 public class OrderSteps extends AbstractTest {
 
-    private ProductsPage productsPage;
-    private CartPage cartPage;
-    private CheckoutCompletePage checkoutCompletePage;
-    User user;// productsPage was stored between steps as a compromise to enable continued UI navigation across steps (login → add to cart → checkout). All DB logic remains localized per step.
+    User user;
+
+    private WebDriver driver;
 
     @Given("user {string} logs in")
     public void userLogin(String username) throws IOException {
         MutableCapabilities caps = getMutableCapabilities();
-        WebDriver driver = getDriver("chrome", caps);
-        try (SqlSession session = MyBatisUtil.getSessionFactory().openSession()) {
+        driver = getDriver("chrome-" + username, caps);
+        try (SqlSession session = MyBatisConfig.getSessionFactory().openSession()) {
             UserMapper userMapper = session.getMapper(UserMapper.class);
             user = userMapper.getUserByUsername(username);
             LoginPage loginPage = new LoginPage(driver);
             loginPage.open();
-            productsPage = loginPage.login(user.getUsername(), user.getPassword());
+            ProductsPage productsPage = loginPage.login(user.getUsername(), user.getPassword());
         }
     }
 
     @And("user adds all ordered products to the cart")
     public void addAllOrderedProductsToCart() {
-        try (SqlSession session = MyBatisUtil.getSessionFactory().openSession()) {
+        try (SqlSession session = MyBatisConfig.getSessionFactory().openSession()) {
             OrderMapper orderMapper = session.getMapper(OrderMapper.class);
             List<Order> orders = orderMapper.getOrdersByUserId(user.getId());
+            ProductsPage productsPage = new ProductsPage(driver);
             for (Order order : orders) {
                 for (int i = 0; i < order.getQuantity(); i++) {
                     productsPage.addProductToCartByName(order.getProductName());
                 }
             }
-            cartPage = productsPage.getHeaderMenuComponent().clickCartButton();
+            CartPage cartPage = productsPage.getHeaderMenuComponent().clickCartButton();
         }
     }
 
     @When("user completes the checkout process")
     public void completeCheckout() {
+        CartPage cartPage = new CartPage(driver);
         CheckoutPage checkoutPage = cartPage.clickCheckoutButton();
         checkoutPage.fillCheckoutForm(user.getFirstName(), user.getLastName(), user.getZipCode());
         CheckoutOverviewPage checkoutOverviewPage = checkoutPage.clickContinueButton();
-        checkoutCompletePage = checkoutOverviewPage.clickFinishButton();
+        CheckoutCompletePage checkoutCompletePage = checkoutOverviewPage.clickFinishButton();
     }
 
     @Then("order should be placed successfully")
     public void verifySuccessMessage() {
+        CheckoutCompletePage checkoutCompletePage = new CheckoutCompletePage(driver);
         assertTrue(checkoutCompletePage.isOrderCompleteMessageDisplayed(), "Order was not completed!");
+        driver.quit();
     }
 
     private static MutableCapabilities getMutableCapabilities() throws IOException {
-        Path tmpProfile = Files.createTempDirectory("chrome-profile-");
         ChromeOptions options = new ChromeOptions();
         options.addArguments(
                 "--disable-notifications",
                 "--disable-popup-blocking",
                 "--start-maximized",
-                "--user-data-dir=" + tmpProfile.toString()
+                "--user-data-dir=/Users/okolenchenko/Library/Application Support/Google/Chrome/ProfileCarina"
         );
-        Map<String,Object> prefs = Map.of(
+        Map<String, Object> prefs = Map.of(
                 "profile.password_manager_enabled", false,
-                "credentials_enable_service",      false
+                "credentials_enable_service", false
         );
         options.setExperimentalOption("prefs", prefs);
+
         MutableCapabilities caps = new MutableCapabilities();
         caps.setCapability(CapabilityType.BROWSER_NAME, "chrome");
         caps.setCapability(ChromeOptions.CAPABILITY, options);
