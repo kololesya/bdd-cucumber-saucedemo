@@ -2,11 +2,14 @@ package com.solvd.laba.steps;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import com.zebrunner.carina.core.AbstractTest;
 import io.cucumber.java.en.*;
 import org.apache.ibatis.session.SqlSession;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.WebDriver;
+
+import static com.solvd.laba.utils.ChromeCapabilitiesProvider.getChromeCapabilities;
 import static org.testng.Assert.assertTrue;
 
 import com.solvd.laba.models.User;
@@ -15,10 +18,6 @@ import com.solvd.laba.mappers.UserMapper;
 import com.solvd.laba.mappers.OrderMapper;
 import com.solvd.laba.utils.MyBatisConfig;
 import com.solvd.laba.web.pages.*;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
 
 public class OrderSteps extends AbstractTest {
 
@@ -28,7 +27,7 @@ public class OrderSteps extends AbstractTest {
 
     @Given("user {string} logs in")
     public void userLogin(String username) throws IOException {
-        MutableCapabilities caps = getMutableCapabilities();
+        MutableCapabilities caps = getChromeCapabilities();
         driver = getDriver("chrome-" + username, caps);
         try (SqlSession session = MyBatisConfig.getSessionFactory().openSession()) {
             UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -68,25 +67,5 @@ public class OrderSteps extends AbstractTest {
         CheckoutCompletePage checkoutCompletePage = new CheckoutCompletePage(driver);
         assertTrue(checkoutCompletePage.isOrderCompleteMessageDisplayed(), "Order was not completed!");
         driver.quit();
-    }
-
-    private static MutableCapabilities getMutableCapabilities() throws IOException {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments(
-                "--disable-notifications",
-                "--disable-popup-blocking",
-                "--start-maximized",
-                "--user-data-dir=/Users/okolenchenko/Library/Application Support/Google/Chrome/ProfileCarina"
-        );
-        Map<String, Object> prefs = Map.of(
-                "profile.password_manager_enabled", false,
-                "credentials_enable_service", false
-        );
-        options.setExperimentalOption("prefs", prefs);
-
-        MutableCapabilities caps = new MutableCapabilities();
-        caps.setCapability(CapabilityType.BROWSER_NAME, "chrome");
-        caps.setCapability(ChromeOptions.CAPABILITY, options);
-        return caps;
     }
 }
